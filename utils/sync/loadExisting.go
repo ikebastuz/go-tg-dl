@@ -7,17 +7,13 @@ import (
 	"path/filepath"
 
 	"tg-dl/constants"
+	"tg-dl/types"
 )
 
 func loadExistingMessages(basePath string, force bool) (*syncState, error) {
 	state := &syncState{
 		basePath: basePath,
 		force:    force,
-	}
-
-	if force {
-		fmt.Println("Force flag set - fetching all messages from scratch")
-		return state, nil
 	}
 
 	jsonPath := filepath.Join(basePath, constants.DataPath)
@@ -28,6 +24,12 @@ func loadExistingMessages(basePath string, force bool) (*syncState, error) {
 
 	if err := json.Unmarshal(data, &state.data); err != nil {
 		return nil, fmt.Errorf("failed to parse existing data.json: %w", err)
+	}
+
+	if force {
+		fmt.Println("Force flag set - fetching all messages from scratch")
+		state.data.Messages = []types.MessageData{}
+		return state, nil
 	}
 
 	// Find the latest message ID

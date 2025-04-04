@@ -17,7 +17,7 @@ func main() {
 	if len(os.Args) < 2 {
 		fmt.Println("Usage:")
 		fmt.Println("  init                          - Create default config.json")
-		fmt.Println("  list                          - List available channels")
+		fmt.Println("  list <path>                   - List available channels and select one")
 		fmt.Println("  sync <channel_id> <path>      - Fetch messages and download media files")
 		fmt.Println("  purge <path>                  - Clean download tracking data")
 		os.Exit(1)
@@ -51,7 +51,10 @@ func main() {
 
 		switch command {
 		case "list":
-			if err := utils.ListChannels(ctx, client, cfg); err != nil {
+			if len(os.Args) < 3 {
+				return fmt.Errorf("usage: list <path>")
+			}
+			if err := utils.ListChannels(ctx, client, cfg, os.Args[2]); err != nil {
 				return fmt.Errorf("error listing channels: %w", err)
 			}
 
