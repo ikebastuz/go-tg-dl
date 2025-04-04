@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-func ensureDir(path string) error {
+func EnsureDir(path string) error {
 	return os.MkdirAll(path, 0755)
 }
 

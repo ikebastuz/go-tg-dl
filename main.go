@@ -9,6 +9,7 @@ import (
 	"tg-dl/config"
 	"tg-dl/tg_client"
 	"tg-dl/utils"
+	"tg-dl/utils/download"
 	"tg-dl/utils/sync"
 )
 
@@ -78,7 +79,7 @@ func main() {
 			}
 
 			fmt.Println("\nDownloading media...")
-			if err := utils.DownloadMedia(ctx, client, channelID, downloadPath); err != nil {
+			if err := download.DownloadMedia(ctx, client, channelID, downloadPath); err != nil {
 				return fmt.Errorf("error downloading media: %w", err)
 			}
 
