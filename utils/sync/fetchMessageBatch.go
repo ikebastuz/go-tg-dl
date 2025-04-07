@@ -15,7 +15,7 @@ func fetchMessageBatch(ctx context.Context, client *telegram.Client, state *sync
 	for {
 		messages, err := client.API().MessagesGetHistory(ctx, &tg.MessagesGetHistoryRequest{
 			Peer: &tg.InputPeerChannel{
-				ChannelID:  state.channelID,
+				ChannelID:  state.data.ChannelID,
 				AccessHash: state.data.AccessHash,
 			},
 			Limit:     batchSize,

@@ -1,6 +1,7 @@
 package types
 
 type DataContainer struct {
+	ChannelID  int64         `json:"channelId"`
 	AccessHash int64         `json:"accessHash"`
 	Messages   []MessageData `json:"messages"`
 }

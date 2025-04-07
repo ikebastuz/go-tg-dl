@@ -12,7 +12,7 @@ import (
 	"tg-dl/constants"
 )
 
-func DownloadMedia(ctx context.Context, client *telegram.Client, channelID int64, basePath string) error {
+func DownloadMedia(ctx context.Context, client *telegram.Client, basePath string) error {
 	data, err := loadMessages(basePath)
 	if err != nil {
 		return fmt.Errorf("error loading messages: %w", err)
@@ -55,7 +55,7 @@ func DownloadMedia(ctx context.Context, client *telegram.Client, channelID int64
 
 	fmt.Printf("Found %d new media files to download (out of %d total)\n", remainingFiles, totalMediaFiles)
 
-	state, err := initializeDownloadState(client, channelID, data.AccessHash, basePath, totalMediaFiles)
+	state, err := initializeDownloadState(client, data.ChannelID, data.AccessHash, basePath, totalMediaFiles)
 	if err != nil {
 		return fmt.Errorf("error initializing download state: %w", err)
 	}

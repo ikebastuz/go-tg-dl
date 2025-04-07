@@ -22,12 +22,11 @@ type syncState struct {
 	force     bool
 }
 
-func SyncMessages(ctx context.Context, client *telegram.Client, channelID int64, basePath string, force bool, cfg *config.Config) error {
+func SyncMessages(ctx context.Context, client *telegram.Client, basePath string, force bool, cfg *config.Config) error {
 	state, err := loadExistingMessages(basePath, force)
 	if err != nil {
 		return err
 	}
-	state.channelID = channelID
 
 	batchSize := cfg.BatchSize
 	oldMessageThreshold := cfg.OldMessageThreshold
@@ -114,7 +113,14 @@ func SyncMessages(ctx context.Context, client *telegram.Client, channelID int64,
 		return allMessages[i].ID < allMessages[j].ID
 	})
 
-	if err := saveMessages(types.DataContainer{Messages: allMessages, AccessHash: state.data.AccessHash}, basePath); err != nil {
+	// Create new data container preserving channel ID
+	newData := types.DataContainer{
+		ChannelID:  state.data.ChannelID,
+		AccessHash: state.data.AccessHash,
+		Messages:   allMessages,
+	}
+
+	if err := saveMessages(newData, basePath); err != nil {
 		return err
 	}
 

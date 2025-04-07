@@ -84,6 +84,7 @@ func ListChannels(ctx context.Context, client *telegram.Client, cfg *config.Conf
 		dataPath := filepath.Join(basePath, constants.DataPath)
 		if _, err := os.Stat(dataPath); os.IsNotExist(err) {
 			data := types.DataContainer{
+				ChannelID:  selectedChannel.ID,
 				AccessHash: selectedChannel.AccessHash,
 				Messages:   []types.MessageData{},
 			}
