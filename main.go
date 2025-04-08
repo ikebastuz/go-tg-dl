@@ -9,6 +9,7 @@ import (
 	"tg-dl/tg_client"
 	"tg-dl/utils"
 	"tg-dl/utils/download"
+	"tg-dl/utils/list"
 	"tg-dl/utils/sync"
 )
 
@@ -53,7 +54,7 @@ func main() {
 			if len(os.Args) < 3 {
 				return fmt.Errorf("usage: list <path>")
 			}
-			if err := utils.ListChannels(ctx, client, cfg, os.Args[2]); err != nil {
+			if err := list.ListChannels(ctx, client, cfg, os.Args[2]); err != nil {
 				return fmt.Errorf("error listing channels: %w", err)
 			}
 
