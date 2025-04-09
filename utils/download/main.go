@@ -10,9 +10,12 @@ import (
 	"github.com/gotd/td/telegram"
 
 	"tg-dl/constants"
+	"tg-dl/types"
 )
 
-func DownloadMedia(ctx context.Context, client *telegram.Client, basePath string) error {
+func DownloadMedia(ctx context.Context, client *telegram.Client) error {
+	basePath := ctx.Value(types.CtxDownloadPathKey).(string)
+
 	data, err := loadMessages(basePath)
 	if err != nil {
 		return fmt.Errorf("error loading messages: %w", err)

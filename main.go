@@ -7,7 +7,7 @@ import (
 
 	"tg-dl/config"
 	"tg-dl/tg_client"
-	"tg-dl/utils"
+	"tg-dl/types"
 	"tg-dl/utils/download"
 	"tg-dl/utils/list"
 	"tg-dl/utils/sync"
@@ -19,7 +19,6 @@ func main() {
 		fmt.Println("  init                          - Create default config.json")
 		fmt.Println("  list <path>                   - List available channels and select one")
 		fmt.Println("  sync <path>      - Fetch messages and download media files")
-		fmt.Println("  purge <path>                  - Clean download tracking data")
 		os.Exit(1)
 	}
 
@@ -41,20 +40,24 @@ func main() {
 		os.Exit(1)
 	}
 
+	if len(os.Args) < 3 {
+		fmt.Println("provide a path to download the files to")
+		os.Exit(1)
+	}
+
 	client := tg_client.InitClientWithConfig(cfg)
 	ctx := context.Background()
+	ctx = context.WithValue(ctx, types.CtxConfigKey, cfg)
+	ctx = context.WithValue(ctx, types.CtxDownloadPathKey, os.Args[2])
 
 	if err := client.Run(ctx, func(ctx context.Context) error {
-		if err := tg_client.MaybeAuth(ctx, client, cfg); err != nil {
+		if err := tg_client.MaybeAuth(ctx, client); err != nil {
 			return fmt.Errorf("error authenticating: %w", err)
 		}
 
 		switch command {
 		case "list":
-			if len(os.Args) < 3 {
-				return fmt.Errorf("usage: list <path>")
-			}
-			if err := list.ListChannels(ctx, client, cfg, os.Args[2]); err != nil {
+			if err := list.ListChannels(ctx, client); err != nil {
 				return fmt.Errorf("error listing channels: %w", err)
 			}
 
@@ -69,25 +72,14 @@ func main() {
 				force = true
 			}
 
-			// Use configured download path if none specified
-			downloadPath := os.Args[2]
-
 			fmt.Println("Syncing messages...")
-			if err := sync.SyncMessages(ctx, client, downloadPath, force, cfg); err != nil {
+			if err := sync.SyncMessages(ctx, client, force); err != nil {
 				return fmt.Errorf("error syncing messages: %w", err)
 			}
 
 			fmt.Println("\nDownloading media...")
-			if err := download.DownloadMedia(ctx, client, downloadPath); err != nil {
+			if err := download.DownloadMedia(ctx, client); err != nil {
 				return fmt.Errorf("error downloading media: %w", err)
-			}
-
-		case "purge":
-			if len(os.Args) != 3 {
-				return fmt.Errorf("usage: purge <path>")
-			}
-			if err := utils.PurgeData(ctx, client, os.Args[2]); err != nil {
-				return fmt.Errorf("error purging data: %w", err)
 			}
 
 		default:

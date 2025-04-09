@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+
 	"tg-dl/config"
 	"tg-dl/constants"
 	"tg-dl/types"
@@ -17,7 +18,14 @@ import (
 	"github.com/gotd/td/tg"
 )
 
-func ListChannels(ctx context.Context, client *telegram.Client, cfg *config.Config, basePath string) error {
+func ListChannels(ctx context.Context, client *telegram.Client) error {
+	cfg, ok := ctx.Value(types.CtxConfigKey).(*config.Config)
+	if !ok {
+		return fmt.Errorf("config not found in context")
+	}
+
+	basePath := ctx.Value(types.CtxDownloadPathKey).(string)
+
 	dialogs, err := client.API().MessagesGetDialogs(ctx, &tg.MessagesGetDialogsRequest{
 		OffsetPeer: &tg.InputPeerEmpty{},
 		Limit:      cfg.ChannelListSize,

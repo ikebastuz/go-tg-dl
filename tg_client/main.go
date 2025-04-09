@@ -12,6 +12,7 @@ import (
 
 	"tg-dl/config"
 	"tg-dl/constants"
+	"tg-dl/types"
 )
 
 func InitClientWithConfig(cfg *config.Config) *telegram.Client {
@@ -25,10 +26,15 @@ func InitClientWithConfig(cfg *config.Config) *telegram.Client {
 	return client
 }
 
-func MaybeAuth(ctx context.Context, client *telegram.Client, cfg *config.Config) error {
+func MaybeAuth(ctx context.Context, client *telegram.Client) error {
 	status, err := client.Auth().Status(ctx)
 	if err != nil {
 		return fmt.Errorf("failed to get auth status: %w", err)
+	}
+
+	cfg, ok := ctx.Value(types.CtxConfigKey).(*config.Config)
+	if !ok {
+		return fmt.Errorf("config not found in context")
 	}
 
 	// If not authorized, do auth flow

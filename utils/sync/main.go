@@ -22,7 +22,14 @@ type syncState struct {
 	force     bool
 }
 
-func SyncMessages(ctx context.Context, client *telegram.Client, basePath string, force bool, cfg *config.Config) error {
+func SyncMessages(ctx context.Context, client *telegram.Client, force bool) error {
+	basePath := ctx.Value(types.CtxDownloadPathKey).(string)
+
+	cfg, ok := ctx.Value(types.CtxConfigKey).(*config.Config)
+	if !ok {
+		return fmt.Errorf("config not found in context")
+	}
+
 	state, err := loadExistingMessages(basePath, force)
 	if err != nil {
 		return err
